@@ -1,0 +1,19 @@
+{
+  "name": "student-directory",
+  "version": "1.0.0",
+  "description": "Generates a student directory PDF from CSV inputs",
+  "main": "index.js",
+  "dependencies": {
+    "fast-csv": "^0.5.3",
+    "lodash": "^2.4.1",
+    "minimist": "^1.1.0",
+    "pdfkit": "^0.7.0",
+    "q": "^1.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "@panurgy",
+  "license": "Anything Goes"
+}
