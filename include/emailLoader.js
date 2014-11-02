@@ -4,7 +4,7 @@ var csv = require("fast-csv");
 
 /**
  * Reads the data from the given file.
- * Returns a promise which is resolved with a big honkin' object which 
+ * Returns a promise which is resolved with a big honkin' object which
  * conains everything.
  */
 exports.read = function(path) {

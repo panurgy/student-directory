@@ -24,7 +24,7 @@ Command-Line Node.js app that needs three CSV files:
    - Name
    - Phone
    - Email
- 
+
 Based on all of that information, the application generates a CSV file that contains the following, grouped by classroom:
   - Student Last Name
   - Student First Name

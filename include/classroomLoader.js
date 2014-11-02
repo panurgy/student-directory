@@ -4,7 +4,7 @@ var csv = require("fast-csv");
 
 /**
  * Reads the data from the given file.
- * Returns a promise which is resolved with a big honkin' object which 
+ * Returns a promise which is resolved with a big honkin' object which
  * conains everything.
  */
 exports.read = function(path) {
@@ -30,11 +30,12 @@ exports.read = function(path) {
             }
 
             // see if this student already has a record in the classroomInfo
-            var studentName = data['Student last'] + '_' + data['Student first '];
-            var studentInfo = classroomInfo.students[studentName];
+            var studentKey = data['Student last'] + '_' + data['Student first '];
+            studentKey = studentKey.toUpperCase();
+            var studentInfo = classroomInfo.students[studentKey];
             if  (! studentInfo ) {
                 // first record for each student wins.
-                classroomInfo.students[studentName] = data;
+                classroomInfo.students[studentKey] = data;
             }
         } catch (ex) {
             deferred.reject(ex);
