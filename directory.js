@@ -17,6 +17,12 @@ if (inputFiles.length != 2 ) {
     return 1;
 }
 
+var emailDomain = argv.domain;
+if (!emailDomain) {
+    console.log("Need an arg:  --domain=your.email.domain.com");
+    return 1;
+}
+
 // make sure all of the input files exist (synchronously)
 inputFiles.map(fs.statSync);
 
@@ -29,6 +35,7 @@ var emailLoader = require('./include/emailLoader');
 var emailPromise = emailLoader.read(inputFiles[1]);
 
 var mergeUtils = require('./include/mergeUtils');
+var allTeachers;
 
 Q.all([classroomPromise, emailPromise]).then(function() {
     var classroomStream = fs.createWriteStream("classTEMP.x");
@@ -47,6 +54,10 @@ Q.all([classroomPromise, emailPromise]).then(function() {
     mergeUtils.mergeClassroomAndEmail(classroomPromise.data,
         emailPromise.data);
     //console.log(classroomPromise.data);
+    allTeachers = mergeUtils.resolveTeachers(classroomPromise.data,
+        emailPromise.data);
+    //console.log(allTeachers);
+
 })
 .catch(function(e) {
     if (e.leftovers) {
@@ -56,6 +67,8 @@ Q.all([classroomPromise, emailPromise]).then(function() {
     }
 })
 .finally(function() {
+    if (!allTeachers) return;
+
     // Dump everything to a new CSV file for the student directory.
     // In a perfect world, we'd generate the PDF here (and earlier versions
     //    of this generator tried that), but it turns out that there are
@@ -78,7 +91,14 @@ Q.all([classroomPromise, emailPromise]).then(function() {
                 if (value['Room'] !== currentClassroom) {
                     // looks like we've entered a new classroom.
                     currentClassroom = value['Room'];
-                    finalStream.write(',,' + currentClassroom +',,\n');
+                    finalStream.write('Grade - Room ' + currentClassroom +'\n');
+                    var teacherName = allTeachers[currentClassroom];
+                    var teacherEmail = teacherName.charAt(0) +
+                        teacherName.split(' ')[1] + '@' + emailDomain;
+                    teacherEmail = teacherEmail.toLowerCase();
+                    finalStream.write(
+                        teacherName +
+                        ' -   / ' + teacherEmail + '\n');
                     classroomCount ++;
                 }
                 var record = [
