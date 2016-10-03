@@ -3,6 +3,31 @@ var Q = require('q');
 var csv = require("fast-csv");
 
 /**
+ * Given an "existing" string of info (like the "primary phone" or "e-mail" address)
+ * for a student, combine it wtih the "new" string.
+ *
+ * Basically, if the "existing" is "empty", then the "new" is used.
+ * Otherwise, the two are used, with a newline in between.
+ */
+var combineData = function(existingString, newString) {
+    var s = existingString;
+    if (!s || s.length === 0) {
+        return newString;
+    }
+
+    if (!newString || newString.length === 0) {
+        return existingString;
+    }
+
+    if (existingString.indexOf(newString) > -1) {
+        // the existingString already contains that info - ignore it.
+        return existingString;
+    }
+
+    return existingString +'  ' + newString;
+}
+
+/**
  * Reads the data from the given file.
  * Returns a promise which is resolved with a big honkin' object which
  * conains everything.
@@ -30,13 +55,18 @@ exports.read = function(path) {
             }
 
             // see if this student already has a record in the classroomInfo
-            var studentKey = data['Student last'] + '_' + data['Student first '];
+            var studentKey = data['Last Name'] + '_' + data['First Name'];
             studentKey = studentKey.toUpperCase();
             var studentInfo = classroomInfo.students[studentKey];
             if  (! studentInfo ) {
                 // first record for each student wins.
                 classroomInfo.students[studentKey] = data;
+            } else {
+                // we have a row of data for this student. Combine stuff.
+                studentInfo.Email = combineData(studentInfo.Email, data.Email);
+                studentInfo['Cell Phone'] = combineData(studentInfo['Cell Phone'], data['Cell Phone']);
             }
+
         } catch (ex) {
             deferred.reject(ex);
         }
